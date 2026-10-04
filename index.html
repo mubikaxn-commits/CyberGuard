@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>CyberGuard</title>
+</head>
+<body>
+
+    <h1 style="text-decoration: dashed; font-size: extralarge; font-family: Georgia, 'Times New Roman', Times, serif;">🛡️ CyberGuard</h1>
+    <p style="font-size: larger; font-family: Georgia, 'Times New Roman', Times, serif;">Internetda xavfsiz bo‘ling!</p>
+
+    <input id="linkInput" type="text" placeholder="Linkni kiriting" style="height: 20px; width: 200px; color: rgb(1, 1, 115);"><br><br>
+   <button id="checkButton" style="font-size: medium; font-family: Georgia, 'Times New Roman', Times, serif; height: 30px; width: 100px; background-color: rgb(1, 1, 115); color: aliceblue;">Tekshirish</button>
+   <p id="result"></p>
+
+  <script>
+    const input = document.getElementById("linkInput");
+    const button = document.getElementById("checkButton");
+    const result = document.getElementById("result");
+
+    button.addEventListener("click", function () {
+        const link = input.value.trim();
+
+        if (link === "") {
+            result.textContent = "⚠️ Iltimos, link kiriting.";
+            return;
+        }
+
+        let risk = 0;
+        let warnings = [];
+
+        // 1. HTTPS tekshirish
+        if (!link.startsWith("https://")) {
+            risk += 20;
+            warnings.push("HTTPS ishlatilmagan");
+        }
+
+        // 2. @ belgisi
+        if (link.includes("@")) {
+            risk += 25;
+            warnings.push("@ belgisi mavjud");
+        }
+
+        // 3. IP manzil
+        const ipPattern = /https?:\/\/(\d{1,3}\.){3}\d{1,3}/;
+
+        if (ipPattern.test(link)) {
+            risk += 25;
+            warnings.push("IP manzil ishlatilgan");
+        }
+
+        // 4. Juda uzun URL
+        if (link.length > 100) {
+            risk += 15;
+            warnings.push("URL juda uzun");
+        }
+
+        // 5. Shubhali so‘zlar
+        const suspiciousWords = [
+            "login",
+            "verify",
+            "password",
+            "free",
+            "bonus",
+            "account"
+        ];
+
+        let foundWords = [];
+
+        suspiciousWords.forEach(function(word) {
+            if (link.toLowerCase().includes(word)) {
+                foundWords.push(word);
+            }
+        });
+
+        if (foundWords.length > 0) {
+            risk += 15;
+            warnings.push("Shubhali so‘zlar topildi");
+        }
+
+        // Maksimal 100%
+        if (risk > 100) {
+            risk = 100;
+        }
+
+        // Natijani chiqarish
+        if (risk <= 20) {
+            result.innerHTML =
+                "🟢 <b>Xavf darajasi: past — " + risk + "%</b><br>" +
+                "Linkda jiddiy shubhali belgilar topilmadi.";
+        }
+        else if (risk <= 50) {
+            result.innerHTML =
+                "🟠 <b>Xavf darajasi: o‘rta — " + risk + "%</b><br>" +
+                "Ehtiyot bo‘lish tavsiya etiladi.<br>" +
+                warnings.join("<br>");
+        }
+        else {
+            result.innerHTML =
+                "🔴 <b>Xavf darajasi: yuqori — " + risk + "%</b><br>" +
+                "Linkda shubhali belgilar mavjud!<br>" +
+                warnings.join("<br>");
+        }
+    });
+</script>
+</script>
+</body>
+</html>
